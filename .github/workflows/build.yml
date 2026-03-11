@@ -6,23 +6,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        # Updated to v4 to fix the Node.js 20 deprecation warning
         uses: actions/checkout@v4
 
       - name: Build with Buildozer
-        # Reverted to v1 because v4 does not exist for this third-party action
         uses: artemsbulgakov/buildozer-action@v1
         env:
-          # This line fixes the "chown: invalid user: 'user'" error
+          # Fix 1: Solves the 'invalid user' error
           USER: root
+          # Fix 2: Solves the 'externally-managed-environment' error
+          PIP_BREAK_SYSTEM_PACKAGES: 1
         with:
           workdir: .
           buildozer_version: master
 
       - name: Upload APK
-        # Updated to v4 to fix the "deprecated version" error
         uses: actions/upload-artifact@v4
         with:
           name: JosephApp-APK
-          # Adjust this path if your buildozer.spec uses a different name
           path: bin/*.apk
