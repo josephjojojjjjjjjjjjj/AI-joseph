@@ -1,0 +1,31 @@
+name: Build APK
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build with Buildozer
+        uses: artemsbulgakov/buildozer-action@v1
+        env:
+          USER: root
+          PIP_BREAK_SYSTEM_PACKAGES: 1
+          # --- NEW FIX STARTS HERE ---
+          # This tells Buildozer not to wait for a [y/n] confirmation
+          BUILDOZER_ALLOW_ORG_TEST_DOMAIN: 1
+          BUILDOZER_WARN_ON_ROOT: 0
+          # --- NEW FIX ENDS HERE ---
+        with:
+          # This command forces Buildozer to say "yes" to all prompts
+          command: yes y | buildozer android debug
+          workdir: .
+          buildozer_version: master
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: JosephApp-APK
+          path: bin/*.apk
