@@ -1,0 +1,28 @@
+name: Build APK
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build with Buildozer
+        uses: artemsbulgakov/buildozer-action@v1
+        env:
+          USER: root
+          PIP_BREAK_SYSTEM_PACKAGES: 1
+          BUILDOZER_ALLOW_ORG_TEST_DOMAIN: 1
+          BUILDOZER_WARN_ON_ROOT: 0
+        with:
+          # This version uses 'sh -c' to ensure the pipe works inside the container
+          command: sh -c "yes | buildozer android debug"
+          workdir: .
+          buildozer_version: master
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: JosephApp-APK
+          path: bin/*.apk
